@@ -1,5 +1,13 @@
+#!/usr/bin/env node
+
 const inquirer = require("inquirer");
 const fs = require("fs");
+const clear = require("clear");
+const chalk = require("chalk");
+const figlet = require("figlet");
+const CLI = require("clui");
+
+const Spinner = CLI.Spinner;
 
 const CHOICES = fs.readdirSync(`${__dirname}/templates`);
 const CURR_DIR = process.cwd();
@@ -24,6 +32,10 @@ const QUESTIONS = [
 ];
 
 const createDirectoryContents = (templatePath, newProjectPath) => {
+  const status = new Spinner("Creating project, please wait...");
+
+  status.start();
+
   const filesToCreate = fs.readdirSync(templatePath);
 
   filesToCreate.forEach(file => {
@@ -47,9 +59,15 @@ const createDirectoryContents = (templatePath, newProjectPath) => {
       );
     }
   });
+
+  status.stop();
 };
 
 const init = async () => {
+  clear();
+
+  console.log(chalk.redBright(figlet.textSync("NODE")));
+
   const answers = await inquirer.prompt(QUESTIONS);
 
   const projectChoice = answers["project-choice"];

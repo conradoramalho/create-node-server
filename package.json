@@ -6,6 +6,9 @@
   "repository": "https://github.com/conradoramalho/create-node-server.git",
   "author": "conradoramalho <conrado.ramalho94@gmail.com>",
   "license": "MIT",
+  "bin": {
+    "create-node-server": "./index.js"
+  },
   "dependencies": {
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
