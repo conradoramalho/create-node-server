@@ -8,30 +8,20 @@ const QUESTIONS = [
   {
     name: "project-choice",
     type: "list",
-    message: "What project template would you like to generate?",
-    choices: CHOICES
+    message: "What project boilerplate would you like to use?",
+    choices: ["SQL", "Mongo", "ElasticSearch", "ExpressGraphql"]
   },
   {
     name: "project-name",
     type: "input",
     message: "Project name:",
-    validate: function(input) {
-      if (/^([A-Za-z\-\_\d])+$/.test(input)) return true;
-      else
-        return "Project name may only include letters, numbers, underscores and hashes.";
+    validate: input => {
+      return /^([A-Za-z\-\_\d])+$/.test(input)
+        ? true
+        : "Project name may only include letters, numbers, underscores or hashes.";
     }
   }
 ];
-
-inquirer.prompt(QUESTIONS).then(answers => {
-  const projectChoice = answers["project-choice"];
-  const projectName = answers["project-name"];
-  const templatePath = `${__dirname}/templates/${projectChoice}`;
-
-  fs.mkdirSync(`${CURR_DIR}/${projectName}`);
-
-  createDirectoryContents(templatePath, projectName);
-});
 
 const createDirectoryContents = (templatePath, newProjectPath) => {
   const filesToCreate = fs.readdirSync(templatePath);
@@ -58,3 +48,17 @@ const createDirectoryContents = (templatePath, newProjectPath) => {
     }
   });
 };
+
+const init = async () => {
+  const answers = await inquirer.prompt(QUESTIONS);
+
+  const projectChoice = answers["project-choice"];
+  const projectName = answers["project-name"];
+  const templatePath = `${__dirname}/templates/${projectChoice}`;
+
+  fs.mkdirSync(`${CURR_DIR}/${projectName}`);
+
+  createDirectoryContents(templatePath, projectName);
+};
+
+init();
