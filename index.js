@@ -9,15 +9,16 @@ const CLI = require("clui");
 const spawn = require("cross-spawn");
 const Spinner = CLI.Spinner;
 
-const CHOICES = fs.readdirSync(`${__dirname}/templates`);
 const CURR_DIR = process.cwd();
+
+const PROJECT_TYPES = ["SQL", "Mongo", "ElasticSearch", "ExpressGraphql"];
 
 const QUESTIONS = [
   {
     name: "project-choice",
     type: "list",
     message: "What project boilerplate would you like to use?",
-    choices: ["SQL", "Mongo", "ElasticSearch", "ExpressGraphql"]
+    choices: PROJECT_TYPES
   },
   {
     name: "project-name",
@@ -142,15 +143,7 @@ const install = ({ prod, dev }) =>
   });
 
 const getDependencies = projectChoice => {
-  const prod = [
-    "bcryptjs",
-    "express",
-    "express-graphql",
-    "graphql",
-    "graphql-iso-date",
-    "jsonwebtoken",
-    "mongoose"
-  ];
+  const prod = ["mongoose"];
 
   const dev = [
     "@babel/cli",
@@ -164,7 +157,29 @@ const getDependencies = projectChoice => {
     "nodemon"
   ];
 
-  return { prod, dev };
+  switch (projectChoice) {
+    case "SQL":
+      return { prod: [...prod], dev };
+    case "Mongo":
+      return { prod: [...prod], dev };
+    case "ElasticSearch":
+      return { prod: [...prod], dev };
+    case "ExpressGraphql":
+      return {
+        prod: [
+          ...prod,
+          "express",
+          "express-graphql",
+          "graphql",
+          "graphql-iso-date",
+          "bcryptjs",
+          "jsonwebtoken"
+        ],
+        dev
+      };
+    default:
+      return { prod, dev };
+  }
 };
 
 init();
