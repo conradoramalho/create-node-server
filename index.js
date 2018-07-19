@@ -6,7 +6,7 @@ const clear = require("clear");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const CLI = require("clui");
-
+const spawn = require("cross-spawn");
 const Spinner = CLI.Spinner;
 
 const CHOICES = fs.readdirSync(`${__dirname}/templates`);
@@ -31,7 +31,7 @@ const QUESTIONS = [
   }
 ];
 
-const createDirectoryContents = (templatePath, newProjectPath) => {
+const createDirectoryContents = (templatePath, projectName) => {
   const status = new Spinner("Creating project, please wait...");
 
   status.start();
@@ -46,16 +46,17 @@ const createDirectoryContents = (templatePath, newProjectPath) => {
     if (stats.isFile()) {
       const contents = fs.readFileSync(origFilePath, "utf8");
 
-      if (file === ".npmignore") file = ".gitignore";
+      if (file === ".ignore") file = ".gitignore";
 
-      const writePath = `${CURR_DIR}/${newProjectPath}/${file}`;
+      const writePath = `${CURR_DIR}/${projectName}/${file}`;
+
       fs.writeFileSync(writePath, contents, "utf8");
     } else if (stats.isDirectory()) {
-      fs.mkdirSync(`${CURR_DIR}/${newProjectPath}/${file}`);
+      fs.mkdirSync(`${CURR_DIR}/${projectName}/${file}`);
 
       createDirectoryContents(
         `${templatePath}/${file}`,
-        `${newProjectPath}/${file}`
+        `${projectName}/${file}`
       );
     }
   });
@@ -76,7 +77,94 @@ const init = async () => {
 
   fs.mkdirSync(`${CURR_DIR}/${projectName}`);
 
+  const packageJson = {
+    name: projectName,
+    version: "0.1.0",
+    private: true
+  };
+
+  fs.writeFileSync(
+    `${CURR_DIR}/${projectName}/package.json`,
+    JSON.stringify(packageJson, null, 2)
+  );
+
   createDirectoryContents(templatePath, projectName);
+
+  process.chdir(`${CURR_DIR}/${projectName}`);
+
+  const dependencies = getDependencies(projectChoice);
+
+  await install(dependencies);
+};
+
+const install = ({ prod, dev }) =>
+  new Promise((resolve, reject) => {
+    const command = "npm";
+    const args = [
+      "install",
+      "--save",
+      "--save-exact",
+      "--loglevel",
+      "error"
+    ].concat(prod);
+
+    const child = spawn(command, args, { stdio: "inherit" });
+
+    child.on("close", code => {
+      if (code !== 0) {
+        reject({
+          command: `${command} ${args.join(" ")}`
+        });
+        return;
+      }
+
+      const command = "npm";
+      const args = [
+        "install",
+        "--save-dev",
+        "--save-exact",
+        "--loglevel",
+        "error"
+      ].concat(dev);
+
+      const child = spawn(command, args, { stdio: "inherit" });
+
+      child.on("close", code => {
+        if (code !== 0) {
+          reject({
+            command: `${command} ${args.join(" ")}`
+          });
+          return;
+        }
+        resolve();
+      });
+    });
+  });
+
+const getDependencies = projectChoice => {
+  const prod = [
+    "bcryptjs",
+    "express",
+    "express-graphql",
+    "graphql",
+    "graphql-iso-date",
+    "jsonwebtoken",
+    "mongoose"
+  ];
+
+  const dev = [
+    "@babel/cli",
+    "@babel/core",
+    "@babel/node",
+    "@babel/plugin-proposal-optional-chaining",
+    "@babel/plugin-proposal-pipeline-operator",
+    "@babel/preset-env",
+    "babel-eslint",
+    "eslint",
+    "nodemon"
+  ];
+
+  return { prod, dev };
 };
 
 init();
