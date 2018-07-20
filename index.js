@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-
 const inquirer = require("inquirer");
 const fs = require("fs");
 const clear = require("clear");
 const chalk = require("chalk");
 const figlet = require("figlet");
-const CLI = require("clui");
-const spawn = require("cross-spawn");
-const Spinner = CLI.Spinner;
+const statics = require("./lib/statics");
+const install = require("./lib/install");
+const createDirectoryContents = require("./lib/files");
 
-const CURR_DIR = process.cwd();
+console.log("statics: ", statics);
 
-const PROJECT_TYPES = ["SQL", "Mongo", "ElasticSearch", "ExpressGraphql"];
+const { INITIAL_DEPENDENCIES } = statics;
+
+const PROJECT_TYPES = fs.readdirSync(`${__dirname}/templates`);
 
 const QUESTIONS = [
   {
@@ -32,43 +33,12 @@ const QUESTIONS = [
   }
 ];
 
-const createDirectoryContents = (templatePath, projectName) => {
-  const status = new Spinner("Creating project, please wait...");
-
-  status.start();
-
-  const filesToCreate = fs.readdirSync(templatePath);
-
-  filesToCreate.forEach(file => {
-    const origFilePath = `${templatePath}/${file}`;
-
-    const stats = fs.statSync(origFilePath);
-
-    if (stats.isFile()) {
-      const contents = fs.readFileSync(origFilePath, "utf8");
-
-      if (file === ".ignore") file = ".gitignore";
-
-      const writePath = `${CURR_DIR}/${projectName}/${file}`;
-
-      fs.writeFileSync(writePath, contents, "utf8");
-    } else if (stats.isDirectory()) {
-      fs.mkdirSync(`${CURR_DIR}/${projectName}/${file}`);
-
-      createDirectoryContents(
-        `${templatePath}/${file}`,
-        `${projectName}/${file}`
-      );
-    }
-  });
-
-  status.stop();
-};
+const CURR_DIR = process.cwd();
 
 const init = async () => {
   clear();
 
-  console.log(chalk.redBright(figlet.textSync("NODE")));
+  console.log(chalk.redBright(figlet.textSync("CREATE NODE SERVER")));
 
   const answers = await inquirer.prompt(QUESTIONS);
 
@@ -86,100 +56,27 @@ const init = async () => {
 
   fs.writeFileSync(
     `${CURR_DIR}/${projectName}/package.json`,
-    JSON.stringify(packageJson, null, 2)
+    JSON.stringify({ ...packageJson }, null, 2)
   );
 
   createDirectoryContents(templatePath, projectName);
 
   process.chdir(`${CURR_DIR}/${projectName}`);
 
-  const dependencies = getDependencies(projectChoice);
-
-  await install(dependencies);
+  readAndInstallDep(`${__dirname}/templates/${projectChoice}/dependencies`);
 };
 
-const install = ({ prod, dev }) =>
-  new Promise((resolve, reject) => {
-    const command = "npm";
-    const args = [
-      "install",
-      "--save",
-      "--save-exact",
-      "--loglevel",
-      "error"
-    ].concat(prod);
+const readAndInstallDep = async path => {
+  const contents = fs.readFileSync(path, "utf8");
 
-    const child = spawn(command, args, { stdio: "inherit" });
+  const { prod, dev } = JSON.parse(contents);
 
-    child.on("close", code => {
-      if (code !== 0) {
-        reject({
-          command: `${command} ${args.join(" ")}`
-        });
-        return;
-      }
+  const dependencies = {
+    prod: [...INITIAL_DEPENDENCIES.prod, ...prod],
+    dev: [...INITIAL_DEPENDENCIES.dev, ...dev]
+  };
 
-      const command = "npm";
-      const args = [
-        "install",
-        "--save-dev",
-        "--save-exact",
-        "--loglevel",
-        "error"
-      ].concat(dev);
-
-      const child = spawn(command, args, { stdio: "inherit" });
-
-      child.on("close", code => {
-        if (code !== 0) {
-          reject({
-            command: `${command} ${args.join(" ")}`
-          });
-          return;
-        }
-        resolve();
-      });
-    });
-  });
-
-const getDependencies = projectChoice => {
-  const prod = ["mongoose"];
-
-  const dev = [
-    "@babel/cli",
-    "@babel/core",
-    "@babel/node",
-    "@babel/plugin-proposal-optional-chaining",
-    "@babel/plugin-proposal-pipeline-operator",
-    "@babel/preset-env",
-    "babel-eslint",
-    "eslint",
-    "nodemon"
-  ];
-
-  switch (projectChoice) {
-    case "SQL":
-      return { prod: [...prod], dev };
-    case "Mongo":
-      return { prod: [...prod], dev };
-    case "ElasticSearch":
-      return { prod: [...prod], dev };
-    case "ExpressGraphql":
-      return {
-        prod: [
-          ...prod,
-          "express",
-          "express-graphql",
-          "graphql",
-          "graphql-iso-date",
-          "bcryptjs",
-          "jsonwebtoken"
-        ],
-        dev
-      };
-    default:
-      return { prod, dev };
-  }
+  await install(dependencies);
 };
 
 init();

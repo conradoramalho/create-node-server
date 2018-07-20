@@ -10,13 +10,20 @@
     "create-node-server": "./index.js"
   },
   "dependencies": {
+    "bcryptjs": "2.4.3",
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "clui": "^0.3.6",
     "configstore": "^3.1.2",
     "cross-spawn": "^6.0.5",
+    "express": "4.16.3",
+    "express-graphql": "0.6.12",
     "figlet": "^1.2.0",
+    "graphql": "0.13.2",
+    "graphql-iso-date": "3.5.0",
     "inquirer": "^6.0.0",
-    "minimist": "^1.2.0"
+    "jsonwebtoken": "8.3.0",
+    "minimist": "^1.2.0",
+    "mongoose": "5.2.4"
   }
 }
