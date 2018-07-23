@@ -1,6 +1,6 @@
 {
   "name": "create-node-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI to create node server boilerplate",
   "main": "index.js",
   "repository": "https://github.com/conradoramalho/create-node-server.git",

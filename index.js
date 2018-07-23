@@ -8,8 +8,6 @@ const statics = require("./lib/statics");
 const install = require("./lib/install");
 const createDirectoryContents = require("./lib/files");
 
-console.log("statics: ", statics);
-
 const { INITIAL_DEPENDENCIES } = statics;
 
 const PROJECT_TYPES = fs.readdirSync(`${__dirname}/templates`);
