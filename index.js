@@ -49,7 +49,12 @@ const init = async () => {
   const packageJson = {
     name: projectName,
     version: "0.1.0",
-    private: true
+    private: true,
+    scripts: {
+      start: "nodemon ./src/server.js --exec babel-node",
+      precommit: "pretty-quick --staged",
+      build: "babel ./src -d ./dist --source-maps"
+    }
   };
 
   fs.writeFileSync(

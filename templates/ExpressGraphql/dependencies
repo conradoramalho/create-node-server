@@ -1,0 +1,12 @@
+{
+  "prod": [
+    "bcryptjs",
+    "express",
+    "express-graphql",
+    "graphql",
+    "graphql-iso-date",
+    "jsonwebtoken",
+    "mongoose"
+  ],
+  "dev": []
+}
