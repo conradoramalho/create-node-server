@@ -1,6 +1,6 @@
 # create-node-server
 
-CLI to create node projects without configurations
+Create Node.JS API without initial configurations
 
 If something don't work, please open a issue: [new issue](https://github.com/conradoramalho/create-node-server/issues)
 
@@ -26,17 +26,23 @@ $ npm i -g create-node-server
 
 ### First project:
 
+> #### Run in terminal
+
 ```sh
 $ create-node-server
 ```
 
-```sh
-$ choose the boilerplate you want
-```
+> #### Choose the template that you want:
 
 ```sh
-$ enter the name of the project
+$ Koa (Single API with Koa)
+$ Koa-SQLServer (API with Koa and tedious to use with mssql)
+$ Express-Graphql-Mongo (API with express, graphql and mongoose)
 ```
+
+> #### Enter the name of the project
+
+The CLI will create the project with the template you chose and the name you entered, then install all the initial packages.
 
 ## Built With
 
@@ -45,5 +51,3 @@ $ enter the name of the project
 ## Authors
 
 > [Conrado Ramalho](https://github.com/conradoramalho)
-
-See also the list of [contributors](https://github.com/conradoramalho/create-node-server/graphs/contributors) who participated in this project.

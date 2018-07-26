@@ -8,7 +8,7 @@ RUN echo 'America/Sao_Paulo' > /etc/timezone && \
 
 WORKDIR /usr/src/app
 
-COPY package*.json  yarn.lock ./
+COPY package*.json ./
 
 RUN npm install
 

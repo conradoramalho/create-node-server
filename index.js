@@ -16,7 +16,7 @@ const QUESTIONS = [
   {
     name: "project-choice",
     type: "list",
-    message: "What project boilerplate would you like to use?",
+    message: "What boilerplate would you like to use?",
     choices: PROJECT_TYPES
   },
   {
@@ -51,9 +51,10 @@ const init = async () => {
     version: "0.1.0",
     private: true,
     scripts: {
-      start: "nodemon ./src/server.js --exec babel-node",
-      precommit: "pretty-quick --staged",
-      build: "babel ./src -d ./dist --source-maps"
+      start: "node ./dist/server.js",
+      dev: "nodemon ./src/server.js --exec babel-node",
+      build: "babel ./src -d ./dist --source-maps",
+      precommit: "pretty-quick --staged"
     }
   };
 
