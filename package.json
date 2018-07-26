@@ -6,6 +6,12 @@
   "repository": "https://github.com/conradoramalho/create-node-server.git",
   "author": "conradoramalho <conrado.ramalho94@gmail.com>",
   "license": "MIT",
+  "keywords": [
+    "node",
+    "CLI",
+    "boilerplate",
+    "create-node-server"
+  ],
   "bin": {
     "create-node-server": "./index.js"
   },

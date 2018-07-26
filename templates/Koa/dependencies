@@ -1,0 +1,10 @@
+{
+  "prod": [
+    "kcors@2.2.2",
+    "koa@2.5.2",
+    "koa-compose@4.1.0",
+    "koa-joi-router@5.1.0",
+    "koa-joi-router-docs@0.1.9"
+  ],
+  "dev": []
+}
